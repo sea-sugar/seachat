@@ -1,0 +1,24 @@
+{
+  "name": "seachat",
+  "version": "1.0.0",
+  "description": "建立一个基于mysql的在线聊天网站，要有用户信息，用户好友，聊天群聊，聊天信息，这个后端架构怎么设计呢？",
+  "main": "index.js",
+  "scripts": {
+    "test1": "echo \"Error: no test specified\" && exit 1",
+    "init": "node init.js",
+    "dev": "node app.js",
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.2",
+    "sequelize": "^6.37.1"
+  }
+}
