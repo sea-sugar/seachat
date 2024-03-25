@@ -10,7 +10,7 @@ router.post('/register', async (req, res) => {
     console.log( user_id ,username, password ,email );
     const ok = await User.findOne({where: { user_id }})
     if (ok) {
-      res.error( 401 , '重复的用户名' );
+      res.error( 200 , '重复的用户名' );
       return ;
     }
     const created_time = new Date();
@@ -25,14 +25,13 @@ router.post('/register', async (req, res) => {
 // 登录
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    console.log(username ,password);
-    const uname = await User.findOne({where: { username }})
-    if (!uname) {
-      res.error( 401 , '错误的用户名或密码' );
+    const { user_id, password } = req.body;
+    const uid = await User.findOne({where: { user_id }})
+    if (!uid) {
+      res.error( 200 , '错误的用户名或密码' );
       return ;
     }
-    const user = await User.findOne({ where: { username, password } });
+    const user = await User.findOne({ where: { user_id, password } });
     if (user) {
       res.success(200,'success' );
     } else {
@@ -47,14 +46,14 @@ router.post('/login', async (req, res) => {
 // 修改密码
 router.post('/changepw', async (req, res) => {
   try {
-    const { username, newPassword } = req.body;
-    const user = await User.findOne({ where: { username } });
+    const { user_id, newPassword } = req.body;
+    const user = await User.findOne({ where: { user_id } });
     if (user) {
       user.password = newPassword;
       await user.save();
       res.success(200, 'success');
     } else {
-      res.error(404, '错误的用户名' );
+      res.error(200, '错误的用户名' );
     }
   } catch (err) {
     console.error(err);
