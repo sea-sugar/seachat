@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-
+const { createToken } = require('../utils/jwt');
 
 // 注册用户
 router.post('/register', async (req, res) => {
@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
     }
     const created_time = new Date();
     await User.create({ user_id , username, password , email , created_time });
-    res.success(200,'success');
+    res.success(200,'success',{username : user.username , user_id : user.user_id , user_avatar : user.user_avatar});
   } catch (err) {
     console.error(err);
     res.error(500 ,'未知错误,请联系管理员重试。' );
@@ -33,9 +33,10 @@ router.post('/login', async (req, res) => {
     }
     const user = await User.findOne({ where: { user_id, password } });
     if (user) {
-      res.success(200,'success' );
+      const Token = createToken({username : user.username , user_id : user.user_id , user_avatar : user.user_avatar});
+      res.success(200,'success',{userinfo:{username : user.username , user_id : user.user_id , user_avatar : user.user_avatar},token : Token});
     } else {
-      res.error( 401 , '错误的用户名或密码' );
+      res.error( 200 , '错误的用户名或密码' );
     }
   } catch (err) {
     console.error(err);
@@ -44,14 +45,14 @@ router.post('/login', async (req, res) => {
 });
 
 // 修改密码
-router.post('/changepw', async (req, res) => {
+router.post('/updatepwd', async (req, res) => {
   try {
     const { user_id, newPassword } = req.body;
     const user = await User.findOne({ where: { user_id } });
     if (user) {
       user.password = newPassword;
       await user.save();
-      res.success(200, 'success');
+      res.success(200, 'success',{username : user.username , user_id : user.user_id , user_avatar : user.user_avatar});
     } else {
       res.error(200, '错误的用户名' );
     }

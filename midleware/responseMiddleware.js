@@ -9,10 +9,11 @@ const responseMiddleware = (req, res, next) => {
   };
 
   // 封装 res.error 方法
-  res.error = (code = 400, msg) => {
+  res.error = (code = 400, msg , data) => {
     res.status(code).json({
       code,
-      msg
+      msg,
+      data,
     });
   };
 
