@@ -28,6 +28,8 @@ npm run dev
 
 ###### 一、mysql表结构设计
 
+踩坑：主键是复合键的时候脑子抽了
+
 1. 用户信息表（users）：
 
    - username（用户名）
@@ -120,20 +122,43 @@ testConnection();
 
 ###### 三、http请求统一中间件处理
 
+踩坑：**`res.status(200)`：** 这个状态码是HTTP响应的状态码，表示请求已成功。这个状态码意味着服务器已成功处理了请求，并且返回了所请求的资源。
+
+**`res.data.code=200`：** 这个是我在响应数据中自己定义的一个字段，通常用来表示请求的处理状态。
+
+如果是下面这种方法的话，status设置成401
+
+```
+res.error = (code = 401, msg) => {
+    res.status(code).json({
+      code,
+      msg
+    });
+  };
+```
+
+axios会直接捕获这个401鉴权报错，导致无法给用户说明401的报错原因
+
+```js
+401 (Unauthorized)
+request.js:91 errAxiosError: Request failed with status code 401
+```
+
+最后我改写成的响应中间件，纯粹是为了分明success和error，
+
 ```js
 const responseMiddleware = (req, res, next) => {
   // 封装 res.success 方法
   res.success = (code = 200, msg = 'success', data) => {
-    res.status(code).json({
+    res.status(200).json({
       code,
       msg,
       data
     });
   };
-
   // 封装 res.error 方法
   res.error = (code = 400, msg) => {
-    res.status(code).json({
+    res.status(200).json({
       code,
       msg
     });
@@ -141,13 +166,16 @@ const responseMiddleware = (req, res, next) => {
 
   next();
 };
-
 module.exports = responseMiddleware;
+
+// 调用 res.error(500 , '未知错误,请联系管理员重试。' );
 ```
 
 ###### 四、操作vuex
 
-在vuex里面写登录逻辑的好处，而不是直接在页面写
+踩坑：不要直接在页面写登录逻辑，应该再store里面写，虽然我之前就是直接在页面写的 = . = 
+
+在vuex里面写登录逻辑的**好**处：
 
 1. **集中管理状态**: 将登录状态的管理放在 Vuex 的 `store` 中，可以确保在整个应用中都可以轻松地访问到登录状态。
 2. **统一的状态更新**: 使用 Vuex 的 `commit` 方法提交 mutation，可以确保状态更新是同步的，并且是按照一定的规范进行的。
@@ -208,7 +236,7 @@ export default user
 
 ```
 
-而不是
+在页面里面写登录逻辑的**坏**处：
 
 1. **状态分散**: 登录状态被保存在组件的状态中，而不是统一管理在 Vuex 中，这样会导致状态的分散和管理复杂度的增加。
 2. **耦合性增加**: 组件直接调用登录 API，会增加组件与业务逻辑之间的耦合度，不利于代码的维护和扩展。
@@ -271,4 +299,56 @@ export default {
 
 
 ###### 五、登录的token验证以及无感刷新token
+
+踩坑：前端按照规范写了，但是后台没有按照这个格式去解析，而且`Bearer`后面有一个空格
+
+W3C 的 http1.0 规范，Authorization 的格式是：
+
+```js
+Authorization: <type> <authorization-parameters>
+Authorization : Bearer Token  
+// 注意空格
+```
+
+常见jwt头：
+
+```js
+Basic 用于 http-basic 认证；
+Bearer 常见于 OAuth 和 JWT 授权；
+Digest MD5 哈希的 http-basic 认证 (已弃用)
+AWS4-HMAC-SHA256 AWS 授权
+```
+
+###### 六、登录鉴权流程
+
+```mermaid
+graph TB
+    E(其他请求) --> B[鉴权白名单]
+    A(登录请求) --> B[鉴权白名单]
+    B[鉴权白名单] --通过--> C{数据库校验?}
+    B[鉴权白名单] --不通过--> ee(结束)
+    C{数据库校验?} -- 通过 --> d[返回token和userinfo]
+    C{数据库校验} -- 不通过 --> e[结束]
+    d[正常业务流程] --> e(结束)
+```
+
+###### 七、添加前端404页面
+
+```json
+  {
+    path: '/404',
+    name: '404',
+    meta: {
+      title: 'Page not found',
+    },
+    component: () => import('@/views/404.vue')
+  },
+  // 所有未定义路由，全部重定向到404页
+  {
+    path: '*',
+    redirect: '/404'
+  }
+
+
+```
 

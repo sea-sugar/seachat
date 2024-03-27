@@ -54,7 +54,7 @@ router.post('/updatepwd', async (req, res) => {
       await user.save();
       res.success(200, 'success',{username : user.username , user_id : user.user_id , user_avatar : user.user_avatar});
     } else {
-      res.error(200, '错误的用户名' );
+      res.error(201, '错误的用户名' );
     }
   } catch (err) {
     console.error(err);
@@ -62,5 +62,15 @@ router.post('/updatepwd', async (req, res) => {
   }
 });
 
+// 验证token 返回用户信息
+router.get('/getinfo', async (req, res) => {
+
+  res.success(200,'success',{userinfo : res.userinfo})
+});
+
+// 退出登录
+router.get('/logout', async (req, res) => {
+  res.success(200,'success', res.userinfo ? null : {userinfo : res.userinfo})
+});
 
 module.exports = router;
