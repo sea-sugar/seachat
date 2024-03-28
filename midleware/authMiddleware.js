@@ -1,6 +1,6 @@
 const { verifyToken , refreshToken} = require('../utils/jwt');
 
-const WhiteList = ['/login','/logout']
+const WhiteList = ['/login','/logout','/register']
 const authMiddleware = (req, res, next) =>{
   // 从请求头中获取 token
   const authorizationHeader = req.headers['authorization'];

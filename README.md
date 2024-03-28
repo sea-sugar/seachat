@@ -33,17 +33,11 @@ npm run dev
 1. 用户信息表（users）：
 
    - username（用户名）
-
    - user_id (用户id)
-
    - password（密码）
-
    - email（邮箱）
-
    - user_avatar（头像URL）
-
    - status（在线状态）
-
    - created_time（创建时间）
 
      
@@ -51,9 +45,7 @@ npm run dev
 2. 用户好友表（user_friends）：
 
    - user_id（用户ID）
-
    - friend_id（好友ID）
-
    - created_time（创建时间）
 
      
@@ -61,15 +53,10 @@ npm run dev
 3. 群聊表（chat_groups）：
 
    - group_id（群聊id）
-
    - group_name（群聊名称）
-
    - description（群聊描述）
-
    - owner_id（群主ID，外键关联users表）
-
    - created_time（创建时间）
-
    - group_avatar （群聊头像）
 
      
