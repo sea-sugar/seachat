@@ -4,7 +4,7 @@ const User = require('./user');
 
 const UserFriend = sequelize.define('UserFriend', {
   user_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',
@@ -13,7 +13,7 @@ const UserFriend = sequelize.define('UserFriend', {
     comment: '用户id',
   },
   friend_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',

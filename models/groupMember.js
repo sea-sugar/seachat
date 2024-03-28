@@ -14,7 +14,7 @@ const GroupMember = sequelize.define('GroupMember', {
     comment: '群聊id',
   },
   user_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',

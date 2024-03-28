@@ -6,6 +6,7 @@ const ChatGroup = sequelize.define('ChatGroup', {
   group_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     comment: '群聊id',
   },
   group_name: {
@@ -19,7 +20,7 @@ const ChatGroup = sequelize.define('ChatGroup', {
     comment: '群聊描述',
   },
   owner_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',

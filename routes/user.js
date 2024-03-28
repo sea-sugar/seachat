@@ -26,7 +26,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { user_id, password } = req.body;
+    console.log("zhanghao:",user_id);
+    console.log("mima:",password);
     const uid = await User.findOne({where: { user_id }})
+    console.log(666,uid);
     if (!uid) {
       res.error( 200 , '错误的用户名或密码' );
       return ;

@@ -12,7 +12,7 @@ const ChatMessage = sequelize.define('ChatMessage', {
     comment: '消息id',
   },
   sender_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',
@@ -21,7 +21,7 @@ const ChatMessage = sequelize.define('ChatMessage', {
     comment: '发送者id',
   },
   receiver_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: User,
       key: 'user_id',
