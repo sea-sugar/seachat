@@ -26,7 +26,7 @@ npm run dev
 
 
 
-###### 一、mysql表结构设计
+#### 一、mysql表结构设计
 
 踩坑：主键是复合键的时候脑子抽了
 
@@ -82,7 +82,7 @@ npm run dev
 
    
 
-###### 二、测试数据库连接，初始化数据库
+#### 二、测试数据库连接，初始化数据库
 
    
 
@@ -107,7 +107,7 @@ async function testConnection() {
 testConnection();
 ```
 
-###### 三、http请求统一中间件处理
+#### 三、http请求统一中间件处理
 
 踩坑：**`res.status(200)`：** 这个状态码是HTTP响应的状态码，表示请求已成功。这个状态码意味着服务器已成功处理了请求，并且返回了所请求的资源。
 
@@ -158,7 +158,7 @@ module.exports = responseMiddleware;
 // 调用 res.error(500 , '未知错误,请联系管理员重试。' );
 ```
 
-###### 四、操作vuex
+#### 四、操作vuex
 
 踩坑：不要直接在页面写登录逻辑，应该再store里面写，虽然我之前就是直接在页面写的 = . = 
 
@@ -285,7 +285,7 @@ export default {
 
 
 
-###### 五、登录的token验证以及无感刷新token
+#### 五、登录的token验证以及无感刷新token
 
 踩坑：前端按照规范写了，但是后台没有按照这个格式去解析，而且`Bearer`后面有一个空格
 
@@ -306,7 +306,7 @@ Digest MD5 哈希的 http-basic 认证 (已弃用)
 AWS4-HMAC-SHA256 AWS 授权
 ```
 
-###### 六、登录鉴权流程
+#### 六、登录鉴权流程
 
 ```mermaid
 graph TB
@@ -319,7 +319,7 @@ graph TB
     d[正常业务流程] --> e(结束)
 ```
 
-###### 七、添加前端404页面
+#### 七、添加前端404页面
 
 ```json
   {
@@ -336,6 +336,52 @@ graph TB
     redirect: '/404'
   }
 
+
+```
+
+#### 八、实时通信，动态绑定用户ID
+
+使用socket.io来实现实时通信功能，包括用户间的私聊和群聊。连接URL时，如果要实现用户间的私聊，可以将用户ID动态地绑定到连接URL中，以便服务器知道要将消息发送给哪个用户。
+
+踩坑：创建 Express 应用的服务器时使用了 `app.listen()` 方法，然后创建了一个 `http` 服务器并传入了 Express 应用。通常情况下，应该只使用一个服务器来监听连接。直接使用 `server.listen()` 方法来启动你的 Express 应用，然后在同一个服务器上初始化 Socket.io。
+
+踩坑：跨域问题，不懂看网上的解决办法搞的
+
+```js
+const socketIo = require('socket.io');
+
+
+module.exports = function initSocket(server) {
+    const io = socketIo(server, {
+        allowEIO3: true,
+        cors: {
+          origins: ['http://localhost:8080', 'http://localhost:8082', '*'],
+          methods: ["GET", "POST"],
+          credentials: true
+        }
+      });
+      
+    // 监听连接事件
+    io.on('connection', socket => {
+        console.log('用户已连接');
+
+        socket.on('message', function (data) {
+            console.log('服务端收到 : ', data);
+            socket.send('你好客户端, ' + data);
+        });
+     
+        //监听自定义事件
+        socket.on('myevent', function (data) {
+            console.log('客户端发送了一个自定义事件', data);
+        });
+
+        // 监听断开连接事件
+        socket.on('disconnect', () => {
+            console.log(`已断开连接`);
+        });
+    });
+    return io   
+}
 
 ```
 
