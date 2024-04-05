@@ -347,9 +347,12 @@ graph TB
 
 踩坑：跨域问题，不懂看网上的解决办法搞的
 
+目前的的解决办法就是发送一个自定义消息sendMessage给服务端，然后插入数据，广播这个数据，接收是对应就接收，否则抛弃这个数据。
+
 ```js
 const socketIo = require('socket.io');
-
+const { verifyToken }  = require('./jwt');
+const chatMessage = require('../models/chatMessage')
 
 module.exports = function initSocket(server) {
     const io = socketIo(server, {
@@ -362,26 +365,41 @@ module.exports = function initSocket(server) {
       });
       
     // 监听连接事件
-    io.on('connection', socket => {
-        console.log('用户已连接');
-
+    io.on('connection', socket => { 
         socket.on('message', function (data) {
-            console.log('服务端收到 : ', data);
-            socket.send('你好客户端, ' + data);
+            console.log(`${new Date().toLocaleString()} 接收到用户 ${decodedToken.username} message 消息 :`, data);
+            // socket.send('你好客户端, ' + data);
         });
      
-        //监听自定义事件
-        socket.on('myevent', function (data) {
-            console.log('客户端发送了一个自定义事件', data);
+        socket.on('sendMessage', async function (data) {
+            console.log(`${new Date().toLocaleString()} 接收到用户 ${decodedToken.username} sendmessage 消息 :`, data);
+            let receiveData = null ;
+            if (data.receiver_id !== undefined) {
+                receiveData = await chatMessage.create({
+                    sender_id: decodedToken.user_id,
+                    receiver_id: data.receiver_id,
+                    content: data.content,
+                    type:data.type,
+                });
+            }else {
+                receiveData = await chatMessage.create({
+                    sender_id: decodedToken.user_id,
+                    group_id: data.group_id,
+                    content: data.content,
+                    type:data.type,
+                });
+            }
+            // 广播消息给所有客户端
+            io.emit('receiveMessage', receiveData);
+            console.log(`${new Date().toLocaleString()} 广播用户 ${decodedToken.username} receiveMessage 消息 :`, receiveData.dataValues);
         });
 
         // 监听断开连接事件
         socket.on('disconnect', () => {
-            console.log(`已断开连接`);
+            console.log(`${new Date().toLocaleString()} 用户 ${decodedToken.username} 已断开连接`);
         });
     });
     return io   
 }
-
 ```
 

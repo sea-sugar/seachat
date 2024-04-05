@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Example</title>
+  <script src="https://cdn.socket.io/4.3.1/socket.io.js"></script>
+  <script>
+    // 连接到服务器
+    const socket = io('ws://localhost:3000',{
+      query: {
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcl9pZCI6ImFkbWluIiwidXNlcl9hdmF0YXIiOiIxIiwiaWF0IjoxNzEyMzM1Mzg0LCJleHAiOjE3MTIzMzcxODR9.xLQR44OURyzp87M3U2ZBwC3J8JtmO-LYNUbUH-XEwjg',
+      }
+    });
+
+    // 当连接建立后的事件处理函数
+    socket.on('connect', () => {
+      console.log('Connected to server');
+      // 在连接建立后发送消息
+      socket.send('Hello from client');
+    });
+
+    // 当收到服务器消息时的事件处理函数
+    socket.on('message', (data) => {
+      console.log('Message from server:', data);
+    });
+
+    // 当连接错误时的事件处理函数
+    socket.on('error', (error) => {
+      console.error('Error:', error);
+      // 在错误发生时尝试重新连接
+      socket.connect();
+    });
+
+    // 当重新连接成功时的事件处理函数
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('Reconnected after attempt', attemptNumber);
+    });
+
+    // 当重新连接失败时的事件处理函数
+    socket.on('reconnect_failed', () => {
+      console.error('Reconnection failed');
+    });
+    
+    // 当接收信息时的处理函数
+    socket.on('receiveMessage', (data) => {
+      receiveMessage(data);
+    });
+
+    // 发送消息的函数
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const message = messageInput.value.trim();
+      if (message !== '') {
+        socket.emit('message',message);
+        const data = {
+          // sender_id: 'admin',
+          receiver_id: 'test', // 如果是私聊
+          // group_id: 'your_group_id', // 如果是群聊
+          content: message,
+          type: 'text',
+        };
+        socket.emit('sendMessage',data);
+        messageInput.value = ''; // 清空输入框
+      }
+    }
+    function receiveMessage(data){
+      console.log('收到信息:', data);
+      // if (data.receiver_id = user_id) {
+        // resolve it
+      // }
+    }
+
+    
+    function disconnect() {
+      socket.disconnect()
+    }
+    
+  </script>
+</head>
+<body>
+  <h1>Socket.IO Example</h1>
+  <input type="text" id="messageInput" placeholder="Type your message here">
+  <button onclick="sendMessage()">Send</button>
+  <button onclick="disconnect()">disconnect</button>
+</body>
+</html>

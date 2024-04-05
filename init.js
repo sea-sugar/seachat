@@ -4,15 +4,40 @@ const UserFriend = require('./models/userFriend');
 const GroupMember = require('./models/groupMember');
 const ChatMessage = require('./models/chatMessage');
 const ChatGroup = require('./models/chatGroup');
+const mysql = require('mysql2/promise'); // 引入 MySQL2 库
 
-// 同步所有模型
-sequelize.sync({ force: true })
+// 创建数据库
+async function createDatabase() {
+  try {
+    const config = require('./config/database'); // 导入数据库配置
+    const connection = await mysql.createConnection({
+      host: config.host,
+      port: config.port,
+      user: config.username,
+      password: config.password
+    });
+
+    await connection.query(`CREATE DATABASE IF NOT EXISTS ${config.database}`);
+    console.log(`创建数据库 ${config.database} 成功`);
+  } catch (error) {
+    console.error(`创建数据库 ${config.database} 失败`, error);
+  }
+}
+
+// 创建数据库，然后执行初始化数据
+createDatabase()
   .then(() => {
-    console.log('数据库同步完成');
-    // 可选: 在这里初始化数据
-    return initData();
-  })
-  .catch(err => console.error('数据库同步失败:', err));
+    // 同步所有模型
+    sequelize.sync({ force: true })
+      .then(() => {
+        console.log('数据库同步完成');
+        // 可选: 在这里初始化数据
+        return initData();
+      })
+      .catch(err => console.error('数据库同步失败:', err));
+  }).catch(err =>{
+    console.error('数据库创建失败:', err)
+  });
 
 async function initData() {
   // 如果表已存在,将会先删除后重新创建
@@ -39,6 +64,6 @@ async function initData() {
     { sender_id: 'admin', receiver_id: 'test',group_id: null ,content:'私聊',type: 'text' ,send_time:new Date()},
     { sender_id: 'admin', receiver_id: null,group_id: 1 ,content:'群聊',type: 'text' ,send_time:new Date()},
   ]);
-
-
+  console.log('数据库初始化完成，即将退出进程');
+  process.exit(0);
 }

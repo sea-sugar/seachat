@@ -1,5 +1,6 @@
 const socketIo = require('socket.io');
 const { verifyToken }  = require('./jwt');
+const chatMessage = require('../models/chatMessage')
 
 module.exports = function initSocket(server) {
     const io = socketIo(server, {
@@ -32,13 +33,31 @@ module.exports = function initSocket(server) {
         }
         console.log(`${new Date().toLocaleString()} 用户 ${decodedToken.username} 已连接 `);
         socket.on('message', function (data) {
-            console.log(`${new Date().toLocaleString()} 服务端收到 : `, data);
-            socket.send('你好客户端, ' + data);
+            console.log(`${new Date().toLocaleString()} 接收到用户 ${decodedToken.username} message 消息 :`, data);
+            // socket.send('你好客户端, ' + data);
         });
      
-        //监听自定义事件
-        socket.on('myevent', function (data) {
-            console.log(`${new Date().toLocaleString()} 客户端发送了一个自定义事件 `, data);
+        socket.on('sendMessage', async function (data) {
+            console.log(`${new Date().toLocaleString()} 接收到用户 ${decodedToken.username} sendmessage 消息 :`, data);
+            let receiveData = null ;
+            if (data.receiver_id !== undefined) {
+                receiveData = await chatMessage.create({
+                    sender_id: decodedToken.user_id,
+                    receiver_id: data.receiver_id,
+                    content: data.content,
+                    type:data.type,
+                });
+            }else {
+                receiveData = await chatMessage.create({
+                    sender_id: decodedToken.user_id,
+                    group_id: data.group_id,
+                    content: data.content,
+                    type:data.type,
+                });
+            }
+            // 广播消息给所有客户端
+            io.emit('receiveMessage', receiveData);
+            console.log(`${new Date().toLocaleString()} 广播用户 ${decodedToken.username} receiveMessage 消息 :`, receiveData.dataValues);
         });
 
         // 监听断开连接事件

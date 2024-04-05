@@ -13,10 +13,10 @@ const http = require('http');
 sequelize
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.');
+    console.log('数据库连接成功');
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
+    console.error('数据库连接失败', err);
   });
 
 dotenv.config()

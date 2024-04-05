@@ -51,6 +51,7 @@ const ChatMessage = sequelize.define('ChatMessage', {
     type: DataTypes.DATE,
     allowNull: false,
     comment: '发送时间',
+    defaultValue: Date.now()
   },
 });
 
