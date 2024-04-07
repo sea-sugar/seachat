@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 
 // 定义密钥
 const secretKey = 'balala';
-const expiresIn = '30m'
+const expiresIn =  60 * 60
+// const expiresIn = 30 * 24 * 60 * 60; // 30天
 
 // 生成 token
 const createToken = (payload) => {

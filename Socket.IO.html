@@ -9,7 +9,8 @@
     // 连接到服务器
     const socket = io('ws://localhost:3000',{
       query: {
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcl9pZCI6ImFkbWluIiwidXNlcl9hdmF0YXIiOiIxIiwiaWF0IjoxNzEyMzM1Mzg0LCJleHAiOjE3MTIzMzcxODR9.xLQR44OURyzp87M3U2ZBwC3J8JtmO-LYNUbUH-XEwjg',
+        // token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcl9pZCI6ImFkbWluIiwidXNlcl9hdmF0YXIiOiIxIiwiaWF0IjoxNzEyNDczOTE2LCJleHAiOjE3MTUwNjU5MTZ9.ouw9WJyyjEAy6SRrR67OoqT3AP7Hzxz4NuWNSuhON-c',
+        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJ1c2VyX2lkIjoidGVzdCIsInVzZXJfYXZhdGFyIjoiMSIsImlhdCI6MTcxMjQ3ODYxNSwiZXhwIjoxNzE1MDcwNjE1fQ.F_54adrOTBPtDlthUqNwpvFbUI699y4NbkXRduPTDb8',
       }
     });
 
@@ -54,9 +55,9 @@
       if (message !== '') {
         socket.emit('message',message);
         const data = {
-          // sender_id: 'admin',
-          receiver_id: 'test', // 如果是私聊
-          // group_id: 'your_group_id', // 如果是群聊
+          sender_id: 'test',
+          receiver_id: 'admin', // 如果是私聊
+          // group_id: 1, // 如果是群聊
           content: message,
           type: 'text',
         };

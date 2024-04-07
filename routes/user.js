@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const UserFriend = require('../models/userFriend');
+const GroupMember = require('../models/groupMember');
+const ChatGroup = require('../models/chatGroup');
 const { createToken } = require('../utils/jwt');
-
+const { Op } = require('sequelize');
 // 注册用户
 router.post('/register', async (req, res) => {
   try {
@@ -76,6 +79,54 @@ router.get('/getinfo', async (req, res) => {
 router.get('/logout', async (req, res) => {
   console.log("用户 id: ",res.userinfo?.user_id ?  res.userinfo.user_id : null , " 退出登录成功！");
   res.success(200,'success', res.userinfo ? null : {userinfo : res.userinfo})
+});
+
+// 获取聊天列表
+router.get('/getList',async (req,res) => {
+  // 查询用户的好友列表
+  const userFriends = await UserFriend.findAll({
+    where: {
+      [Op.or]: [
+        { user_id: res.userinfo.user_id },
+        { friend_id: res.userinfo.user_id }
+      ]
+    }
+  });
+
+  const friendIds = userFriends.map(userFriend => {
+    return userFriend.user_id === res.userinfo.user_id ? userFriend.friend_id : userFriend.user_id;
+  });
+
+  const friendInfoPromises = friendIds.map(async friendId => {
+    return User.findOne({
+      where: {
+        user_id: friendId
+      },
+      attributes: ['user_id', 'username', 'user_avatar', 'status']
+    })
+  });
+
+  // 查询用户所在的群列表
+  const userGroups = await GroupMember.findAll({
+    where: {
+      user_id: res.userinfo.user_id
+    },
+  })
+
+  const groupInfoPromises = userGroups.map(async group => {
+    return ChatGroup.findOne({
+      where: {
+        group_id: group.group_id
+      },
+      attributes: ['group_id', 'group_name', 'description', 'owner_id' , 'group_avatar' , 'created_time']
+    })
+  });
+
+  
+  const friendInfo = await Promise.all(friendInfoPromises);
+  const groupInfo = await Promise.all(groupInfoPromises);
+  console.log("用户 id: ",res.userinfo.user_id , " 获取聊天列表成功！",friendInfo);
+  res.success(200,'success',{userinfo : res.userinfo , friendInfo: friendInfo ,groupInfo:groupInfo})
 });
 
 module.exports = router;

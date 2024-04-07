@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = require('./routes/user');
+const msgRouter = require('./routes/message');
 const sequelize = require('./utils/database');
 const dotenv = require('dotenv') //环境中间件
 const bodyParser = require ('body-parser');
@@ -29,6 +30,7 @@ app.use(bodyParser.json()); //解析 application/json
 app.use(bodyParser.urlencoded({ extended: true })); //解析 application/x-www-form-urlencoded  
 app.use(responseMiddleware);
 app.use('/user', authMiddleware ,userRouter);
+app.use('/msg', authMiddleware ,msgRouter);
 
 initSocket(server);
 
