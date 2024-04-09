@@ -339,9 +339,9 @@ graph TB
 
 ```
 
-#### 八、实时通信，动态绑定用户ID
+#### 八、实时通信
 
-使用socket.io来实现实时通信功能，包括用户间的私聊和群聊。连接URL时，如果要实现用户间的私聊，可以将用户ID动态地绑定到连接URL中，以便服务器知道要将消息发送给哪个用户。
+使用socket.io来实现实时通信功能，包括用户间的私聊和群聊。连接URL时，如果要实现用户间的私聊，可以将用户ID动态地绑定到连接URL中，以便服务器知道要将消息发送给哪个用户。（没实现）
 
 踩坑：创建 Express 应用的服务器时使用了 `app.listen()` 方法，然后创建了一个 `http` 服务器并传入了 Express 应用。通常情况下，应该只使用一个服务器来监听连接。直接使用 `server.listen()` 方法来启动你的 Express 应用，然后在同一个服务器上初始化 Socket.io。
 
@@ -401,5 +401,100 @@ module.exports = function initSocket(server) {
     });
     return io   
 }
+```
+
+#### 九、输入框的回车与换行
+
+踩坑：因为按下`shift`+`enter`的时候触发`handleShiftEnter`，`enter`也触发了`handleEnter`，所有要在`handleEnter`判断是否按下了shift，还有就光标的位置得正确。
+
+```vue
+<el-input
+        type="textarea"
+        resize="none"
+        :autosize="{ minRows: 5, maxRows: 7}"
+        v-model="textArea"
+        @keydown.native.shift.enter="handleShiftEnter"
+        @keydown.enter.native="handleEnter"
+        >
+</el-input>
+```
+
+```js
+handleShiftEnter(event) {
+        event.preventDefault(); // 阻止默认行为（不插入换行符）
+
+        const textarea = event.target;
+        const cursorPos = textarea.selectionStart;
+        const textBeforeCursor = this.textArea.substring(0, cursorPos);
+        const textAfterCursor = this.textArea.substring(cursorPos);
+
+        // 更新文本并保持光标位置
+        this.textArea = textBeforeCursor + '\n' + textAfterCursor;
+        const newCursorPos = cursorPos + 1;
+        this.$nextTick(() => {
+          textarea.setSelectionRange(newCursorPos, newCursorPos);
+        });
+      },
+handleEnter(event){
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault(); // 阻止默认行为（不插入换行符）
+          this.sendMessage();
+        }
+      },
+```
+
+#### 十、查询消息
+
+踩坑：插入新的一行消息之后要：重新加载包含关联数据的实例
+
+```js
+await receiveData.reload();
+```
+
+我都以这样关联查询的方式来查询消息的发送、接收
+
+```js
+// 设置 ChatMessage 模型和 User 模型之间的关联关系
+ChatMessage.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
+ChatMessage.belongsTo(User, { foreignKey: 'receiver_id', as: 'receiver' });
+ChatMessage.belongsTo(ChatGroup, { foreignKey: 'group_id', as: 'group' });
+```
+
+
+
+查询
+
+```js
+messages = await ChatMessage.findAll({ // 私聊消息
+where: {group_id: groupId},
+	order: [['send_time', 'ASC']], // 按照发送时间升序排列
+	attributes: ['sender_id', 'receiver_id', 'group_id', 'content','type','send_time'],
+	include: [
+		{ model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息
+		{ model: ChatGroup, as: 'group', attributes: ['group_id', 'group_name', 'group_avatar', 'description'] } // 关联群聊信息
+	]
+});
+```
+
+```js
+messages = await ChatMessage.findAll({ // 群聊消息
+	where: {
+		[Op.or]: [
+		{
+			sender_id: res.userinfo.user_id,
+			receiver_id: receiverId,
+		},
+		{
+			sender_id: receiverId,
+			receiver_id: res.userinfo.user_id,
+		},
+	],},
+	attributes: ['sender_id', 'receiver_id', 'group_id', 'content','type','send_time'],
+	order: [['send_time', 'ASC']], // 按照发送时间升序排列
+	include: [
+		{ model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息
+		{ model: User, as: 'receiver', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联接收者信息
+		]
+});
 ```
 

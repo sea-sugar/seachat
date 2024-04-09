@@ -51,8 +51,11 @@ const ChatMessage = sequelize.define('ChatMessage', {
     type: DataTypes.DATE,
     allowNull: false,
     comment: '发送时间',
-    defaultValue: Date.now()
+    defaultValue: () => new Date() // 使用函数动态计算默认值为当前时间
   },
 });
-
+// 设置 ChatMessage 模型和 User , ChatGroup 模型之间的关联关系
+ChatMessage.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
+ChatMessage.belongsTo(User, { foreignKey: 'receiver_id', as: 'receiver' });
+ChatMessage.belongsTo(ChatGroup, { foreignKey: 'group_id', as: 'group' });
 module.exports = ChatMessage;
