@@ -129,4 +129,25 @@ router.get('/getList',async (req,res) => {
   res.success(200,'success',{userinfo : res.userinfo , friendInfo: friendInfo ,groupInfo:groupInfo})
 });
 
+// 修改个人信息
+router.post('/updateUerinfo',async (req,res) => {
+  try {
+    const { username, avatar } = req.body;
+    const user_id = res.userinfo.user_id
+    const user = await User.findOne({ where: { user_id :user_id } });
+    if (user) {
+      user.username = username;
+      user.user_avatar = avatar;
+      await user.save();
+      const Token = createToken({username : user.username , user_id : user.user_id , user_avatar : user.user_avatar});
+      res.success(200,'success',{userinfo:{username : user.username , user_id : user.user_id , user_avatar : user.user_avatar},token : Token});
+    } else {
+      res.error(201, '修改失败' );
+    }
+  } catch (err) {
+    console.log(err);
+    res.error(500 , '未知错误,请联系管理员重试。' );
+  }
+})
+
 module.exports = router;
