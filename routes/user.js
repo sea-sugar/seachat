@@ -130,7 +130,7 @@ router.get('/getList',async (req,res) => {
 });
 
 // 修改个人信息
-router.post('/updateUerinfo',async (req,res) => {
+router.post('/updateUserinfo',async (req,res) => {
   try {
     const { username, avatar } = req.body;
     const user_id = res.userinfo.user_id

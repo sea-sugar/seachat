@@ -498,3 +498,6 @@ messages = await ChatMessage.findAll({ // 群聊消息
 });
 ```
 
+#### 十一、引入public和assests
+
+[vue-cli 3.0静态资源路径问题（何时使用 public 文件夹）_vue-cli3 pubilc path-CSDN博客](https://blog.csdn.net/qappleh/article/details/103005111)
