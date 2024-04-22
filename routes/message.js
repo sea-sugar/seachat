@@ -68,7 +68,7 @@ router.get('/getMessage', async (req, res) => {
                     ],
                 },
                 attributes: ['sender_id', 'receiver_id', 'group_id', 'content', 'type', 'send_time'],
-                order: [['send_time', 'ASC']], // 按照发送时间升序排列
+                order: [['send_time', 'DESC']],
                 include: [
                     { model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息
                     { model: User, as: 'receiver', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联接收者信息
@@ -79,7 +79,7 @@ router.get('/getMessage', async (req, res) => {
         } else { // 群聊消息
             messages = await ChatMessage.findAll({
                 where: { group_id: groupId },
-                order: [['send_time', 'ASC']], // 按照发送时间升序排列
+                order: [['send_time', 'DESC']],
                 attributes: ['sender_id', 'receiver_id', 'group_id', 'content', 'type', 'send_time'],
                 include: [
                     { model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息
@@ -89,7 +89,7 @@ router.get('/getMessage', async (req, res) => {
                 offset: offset // 偏移量
             });
         }
-
+        messages.reverse();
         res.success(200, 'success', { messages, totalMessages });
         console.log("用户 id: ", res.userinfo.user_id, " 获取消息成功");
     } catch (error) {
@@ -123,7 +123,7 @@ router.get('/getLastMessage', async (req, res) => {
                     ],
                 },
                 attributes: ['sender_id', 'receiver_id', 'group_id', 'content','type','send_time'],
-                order: [['send_time', 'DESC']], // 按照发送时间升序排列
+                order: [['send_time', 'DESC']],
                 include: [
                     { model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息
                     { model: User, as: 'receiver', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联接收者信息
@@ -137,7 +137,7 @@ router.get('/getLastMessage', async (req, res) => {
         try {
             message = await ChatMessage.findOne({
                 where: {group_id: groupId},
-                order: [['send_time', 'DESC']], // 按照发送时间升序排列
+                order: [['send_time', 'DESC']],
                 attributes: ['sender_id', 'receiver_id', 'group_id', 'content','type','send_time'],
                 include: [
                     { model: User, as: 'sender', attributes: ['user_id', 'username', 'user_avatar'] }, // 关联发送者信息

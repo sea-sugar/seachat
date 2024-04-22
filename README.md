@@ -10,7 +10,7 @@
 
 ```bash
 ## 克隆项目源码包
-git clone https://github.com/gzydong/LumenIM.git
+git clone https://github.com/sea-sugar/seachat.git
 
 ## 安装项目依赖扩展组件
 npm install
