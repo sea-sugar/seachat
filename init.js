@@ -5,11 +5,11 @@ const GroupMember = require('./models/groupMember');
 const ChatMessage = require('./models/chatMessage');
 const ChatGroup = require('./models/chatGroup');
 const mysql = require('mysql2/promise'); // 引入 MySQL2 库
-
+const config = require('./config/database'); // 导入数据库配置
 // 创建数据库
 async function createDatabase() {
   try {
-    const config = require('./config/database'); // 导入数据库配置
+   
     const connection = await mysql.createConnection({
       host: config.host,
       port: config.port,
@@ -42,22 +42,27 @@ createDatabase()
 async function initData() {
   // 如果表已存在,将会先删除后重新创建
   await User.bulkCreate([ 
-    { user_id : 'admin' , username: 'admin', password: '123456', email: 'admin@qq.com', user_avatar : '1',status : 'offline',created_time: new Date() },
-    { user_id : 'test' , username: 'test', password: '123456', email: 'test@qq.com', user_avatar : '1',status : 'offline',created_time: new Date() },
+    { user_id : 'admin' , username: 'admin', password: '123456', email: 'admin@qq.com', user_avatar : '/1.png',status : 'offline',created_time: new Date() },
+    { user_id : 'test' , username: 'test', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
+    { user_id : 'cxl' , username: 'cai', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
+    { user_id : 'mzl' , username: 'mou', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
   ]);
 
   await UserFriend.bulkCreate([
     { user_id: 'admin', friend_id: 'test', created_time: new Date() },
+    { user_id: 'cxl', friend_id: 'mzl', created_time: new Date() },
   ]);
   
   await ChatGroup.bulkCreate([
-    { group_name: 'qunliao123', description: '123', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '1'  },
-    { group_name: 'qunliao234', description: '234', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '1'  },
+    { group_name: 'qunliao123', description: '123', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '/7.png'  },
+    { group_name: 'qunliao234', description: '234', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '/8.png'  },
   ]);
 
   await GroupMember.bulkCreate([
     { group_id : 1,  user_id: 'admin' ,joined_time: new Date() , },
     { group_id : 1,  user_id: 'test' ,joined_time: new Date() , },
+    { group_id : 1,  user_id: 'cxl' ,joined_time: new Date() , },
+    { group_id : 1,  user_id: 'mzl' ,joined_time: new Date() , },
   ]);
 
   await ChatMessage.bulkCreate([
