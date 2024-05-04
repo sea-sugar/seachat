@@ -150,4 +150,31 @@ router.post('/updateUserinfo',async (req,res) => {
   }
 })
 
+// 添加联系人
+router.post('/findFriends',async (req,res) => {
+  try {
+    const { inputId = '' } = req.body;
+    const user_id = res.userinfo.user_id
+    const user = await User.findOne({ where: { user_id :inputId } ,attributes: ['user_id', 'username','user_avatar','status']});
+    const group = await ChatGroup.findOne({ where: { group_id :inputId } ,attributes: ['group_name', 'group_id','description','owner_id','group_avatar']});
+    if (user || group) {
+      const created_time = new Date();
+      if (user) {
+        const friend_id = inputId
+        await UserFriend.create({ user_id , friend_id, created_time });
+      }else{
+        const joined_time = created_time
+        const group_id = inputId
+        await GroupMember.create({ group_id , user_id, joined_time ,created_time});
+      }
+
+      res.success(200,'success',{userinfo:res.userinfo , user : user, group:group});
+    } else {
+      res.error(201, '暂无该用户信息' );
+    }
+  } catch (err) {
+    console.log(err);
+    res.error(500 , '未知错误,请联系管理员重试。' );
+  }
+})
 module.exports = router;

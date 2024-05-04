@@ -1,5 +1,7 @@
 ### sea sugar 在线聊天网站
 
+一个基于vue2、express、mysql的在线聊天网站。
+
 ------
 
 建立一个基于express、mysql的在线聊天网站，要有用户信息，用户好友，聊天群聊，聊天信息，后端架构设计设计，表模型定义，数据库连接，http请求统一中间件处理。
@@ -24,7 +26,8 @@ npm run dev
 
 ```
 
-
+#### 项目展示
+![image](https://github.com/sea-sugar/sugarchat/blob/main/public/1.png)
 
 #### 一、mysql表结构设计
 

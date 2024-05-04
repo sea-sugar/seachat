@@ -44,30 +44,56 @@ async function initData() {
   await User.bulkCreate([ 
     { user_id : 'admin' , username: 'admin', password: '123456', email: 'admin@qq.com', user_avatar : '/1.png',status : 'offline',created_time: new Date() },
     { user_id : 'test' , username: 'test', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
-    { user_id : 'cxl' , username: 'cai', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
-    { user_id : 'mzl' , username: 'mou', password: '123456', email: 'test@qq.com', user_avatar : '/2.png',status : 'offline',created_time: new Date() },
+    { user_id : 'pineapple' , username: 'pineapple', password: '123456', email: 'pineapple@qq.com', user_avatar : '/3.png',status : 'offline',created_time: new Date() },
+    { user_id : 'bread' , username: 'bread', password: '123456', email: 'bread@qq.com', user_avatar : '/4.png',status : 'offline',created_time: new Date() },
+    { user_id : 'dorayaki' , username: 'dorayaki', password: '123456', email: 'dorayaki@qq.com', user_avatar : '/5.png',status : 'offline',created_time: new Date() },
   ]);
 
   await UserFriend.bulkCreate([
     { user_id: 'admin', friend_id: 'test', created_time: new Date() },
-    { user_id: 'cxl', friend_id: 'mzl', created_time: new Date() },
+    { user_id: 'pineapple', friend_id: 'admin', created_time: new Date() },
+    { user_id: 'pineapple', friend_id: 'bread', created_time: new Date() },
+    { user_id: 'bread', friend_id: 'dorayaki', created_time: new Date() },
+    { user_id: 'bread', friend_id: 'admin', created_time: new Date() },
+    { user_id: 'dorayaki', friend_id: 'admin', created_time: new Date() },
+    { user_id: 'dorayaki', friend_id: 'pineapple', created_time: new Date() },
   ]);
   
   await ChatGroup.bulkCreate([
-    { group_name: 'qunliao123', description: '123', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '/7.png'  },
-    { group_name: 'qunliao234', description: '234', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '/8.png'  },
+    { group_name: 'A Group', description: 'Pineapple Bread Dorayaki', owner_id: 'admin' ,created_time: new Date() ,group_avatar: '/6.png'  },
   ]);
 
   await GroupMember.bulkCreate([
     { group_id : 1,  user_id: 'admin' ,joined_time: new Date() , },
     { group_id : 1,  user_id: 'test' ,joined_time: new Date() , },
-    { group_id : 1,  user_id: 'cxl' ,joined_time: new Date() , },
-    { group_id : 1,  user_id: 'mzl' ,joined_time: new Date() , },
+    { group_id : 1,  user_id: 'pineapple' ,joined_time: new Date() , },
+    { group_id : 1,  user_id: 'bread' ,joined_time: new Date() , },
+    { group_id : 1,  user_id: 'dorayaki' ,joined_time: new Date() , },
   ]);
 
   await ChatMessage.bulkCreate([
     { sender_id: 'admin', receiver_id: 'test',group_id: null ,content:'私聊',type: 'text' ,send_time:new Date()},
-    { sender_id: 'admin', receiver_id: null,group_id: 1 ,content:'群聊',type: 'text' ,send_time:new Date()},
+    { sender_id: 'admin', receiver_id: null,group_id: 1 ,content:'A Group Time',type: 'text' ,send_time:new Date()},
+    { sender_id: 'admin', receiver_id: 'pineapple',group_id: null ,content:'我是admin',type: 'text' ,send_time:new Date()},
+    { sender_id: 'admin', receiver_id: 'bread',group_id: null ,content:'我是admin',type: 'text' ,send_time:new Date()},
+    { sender_id: 'admin', receiver_id: 'dorayaki',group_id: null ,content:'我是admin',type: 'text' ,send_time:new Date()},
+
+    { sender_id: 'pineapple', receiver_id: 'bread',group_id: null ,content:'我是菠萝',type: 'text' ,send_time:new Date()},
+    { sender_id: 'pineapple', receiver_id: 'admin',group_id: null ,content:'我是菠萝',type: 'text' ,send_time:new Date()},
+    { sender_id: 'pineapple', receiver_id: 'dorayaki',group_id: null ,content:'我是菠萝',type: 'text' ,send_time:new Date()},
+
+    { sender_id: 'bread', receiver_id: 'admin',group_id: null ,content:'我是面包',type: 'text' ,send_time:new Date()},
+    { sender_id: 'bread', receiver_id: 'dorayaki',group_id: null ,content:'我是面包',type: 'text' ,send_time:new Date()},
+    { sender_id: 'bread', receiver_id: 'pineapple',group_id: null ,content:'我是面包',type: 'text' ,send_time:new Date()},
+
+    { sender_id: 'dorayaki', receiver_id: 'pineapple',group_id: null ,content:'我是铜锣烧',type: 'text' ,send_time:new Date()},
+    { sender_id: 'dorayaki', receiver_id: 'admin',group_id: null ,content:'我是铜锣烧',type: 'text' ,send_time:new Date()},
+    { sender_id: 'dorayaki', receiver_id: 'bread',group_id: null ,content:'我是铜锣烧',type: 'text' ,send_time:new Date()},
+
+    { sender_id: 'admin', receiver_id: null,group_id: 1 ,content:'我是admin',type: 'text' ,send_time:new Date()},
+    { sender_id: 'pineapple', receiver_id: null,group_id: 1 ,content:'我是菠萝',type: 'text' ,send_time:new Date()},
+    { sender_id: 'bread', receiver_id: null,group_id: 1 ,content:'我是面包',type: 'text' ,send_time:new Date()},
+    { sender_id: 'dorayaki', receiver_id: null,group_id: 1 ,content:'我是铜锣烧',type: 'text' ,send_time:new Date()},
   ]);
   console.log('数据库初始化完成，即将退出进程');
   process.exit(0);
