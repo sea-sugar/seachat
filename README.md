@@ -23,6 +23,9 @@ npm run init
 # 启动本地开发环境
 npm run dev
 
+# 打包部署
+docker-compose build
+docker-compose up -d
 
 ```
 

@@ -1,33 +1,31 @@
-# docker run -d --name node_sea_chat -p 3000:3000 -v /home/lhy/express/seachat:/usr/share/express/seachat node
-
+# docker-compose build
+# docker-compose up -d
+# 用的宿主机的数据库
 # 基础镜像为 Alpine Linux 版本 3.13， 使用 Alpine Linux 作为容器的基础操作系统
 FROM alpine:3.13
 
-# 容器默认时区为UTC，如需使用上海时间请启用以下时区设置命令
-# RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
-
 # 安装依赖包，如需其他依赖包，请到alpine依赖包管理(https://pkgs.alpinelinux.org/packages?name=php8*imagick*&branch=v3.13)查找。
 RUN apk add --update --no-cache nodejs npm
+# 创建并设置工作目录
+WORKDIR /usr/src/app
 
-# 指定工作目录
-WORKDIR /app
+# 复制 package.json 和 package-lock.json（如果有）到工作目录
+COPY package*.json ./
 
-# 拷贝包管理文件
-COPY package*.json /app
-
-# npm 源，选用国内镜像源以提高下载速度
-RUN npm config set registry https://registry.npm.taobao.org/
-
-# npm 安装依赖
+# 安装项目依赖
 RUN npm install
+
+# 复制所有应用程序文件到工作目录
+COPY . .
+
+# 初始化数据库
 RUN npm run init
 
-# 将当前目录（dockerfile所在目录）下所有文件都拷贝到工作目录下（.gitignore中的文件除外）
-COPY . /app
+# 暴露应用程序使用的端口
+EXPOSE 3000
 
-# 执行启动命令.
-# 写多行独立的CMD命令是错误写法！只有最后一行CMD命令会被执行，之前的都会被忽略，导致业务报错。
-# 请参考[Docker官方文档之CMD命令](https://docs.docker.com/engine/reference/builder/#cmd)
-# 执行 package.json 的 scripts 中约定的自定义命令时，格式必须为 CMD ["npm", "run", "命令"]
+# 启动应用
 CMD ["npm", "run", "dev"]
+
+
 
